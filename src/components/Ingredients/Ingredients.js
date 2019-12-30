@@ -1,25 +1,49 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import store, {ADD_INGREDIENT} from "./../../store";
 
 class Ingredients extends Component {
   constructor(props) {
     super(props);
+    const reduxState = store.getState();
+
     this.state = {
-      ingredients: [],
-      input: ""
+      ingredients: reduxState.ingredients,
+      input:""
     };
   }
+ //componentDidMount allows us to see the data without toggling between pages 
+    //use subscribe to update our page any time the data on redux state changes 
+    //subscribe takes a cb as an argument, fires any time there is an update to redux.
+    //getState catches the updated version of the Redux state 
+  componentDidMount() {
+    store.subscribe (() => {
+      const reduxState = store.getState();
+      this.setState({
+        ingredients: reduxState.ingredients
+      });
+    });
+  }
+
   handleChange(val) {
     this.setState({
       input: val
     });
   }
+
   addIngredient() {
     // Send data to Redux state
+    //use dispatch to send back to store 
+    store.dispatch({
+      type: ADD_INGREDIENT,
+      payload: this.state.input
+    });
+
     this.setState({
       input: ""
     });
   }
+
   render() {
     const ingredients = this.state.ingredients.map((ingredient, i) => {
       return <li key={i}>{ingredient}</li>;
